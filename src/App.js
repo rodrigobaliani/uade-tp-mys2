@@ -8,14 +8,32 @@ const X_VALUES_COUNT = 50;
 
 const FlexibleXYPlot = makeWidthFlexible(XYPlot);
 
+const GraphMethodType = {
+  RECTANGLES: {key: 'RECTANGLES', name: 'Rectángulos'},
+  MONTECARLO: {key: 'MONTECARLO', name: 'Monte Carlo'}
+};
+
 function App() {
 
-  const [funct, setFunct] = useState('x^2+ 2x +4');
+  const [funct, setFunct] = useState('x');
   const [a, setA] = useState('2');
   const [b, setB] = useState('4');
   const [n, setN] = useState('20');
   const [graphData, setGraphData] = useState({});
-  const [graphMethod, setGraphMethod] = useState('')
+  const [graphMethod, setGraphMethod] = useState(GraphMethodType.RECTANGLES.key)
+  const [compiledRectangles, setCompiledRectangles] = useState({});
+  const [aproximationResult, setAproximationResult] = useState('')
+
+  function compileOperation(graphMethod) {
+    if (graphMethod == GraphMethodType.RECTANGLES.key) {
+      console.log("Rectangles method");
+      const compiledRectangles = calculateRectangles(funct, a, b, n);
+      setCompiledRectangles(compiledRectangles);
+      setAproximationResult(compiledRectangles['area']);
+    } else if (graphMethod == GraphMethodType.MONTECARLO.key) {
+      console.log("Montecarlo method");
+    }
+  }
 
   function generateChartData(f, a, b) {
     const newExpression = math.parse(f);
@@ -40,15 +58,15 @@ function App() {
       const evaluation_x = x0 + rectangleWidth / 2;
       const y = compiledFunction.evaluate({x: evaluation_x});
       const graph_points = {
-        x1: x0, // Rectangle left side coordinate
-        x2: x0 + rectangleWidth, // Rectangle right side coordinate
+        x0: x0, // Rectangle left side coordinate
+        x: x0 + rectangleWidth, // Rectangle right side coordinate
         y: y, // Rectangle height (Y value)
       };
       area += rectangleWidth * y;
       rectangles_points.push(graph_points);
     });
   
-    return {'rectangles_points': rectangles_points, 'totalArea': area}
+    return {'rectangles_points': rectangles_points, 'area': area}
   }
 
   return (
@@ -69,20 +87,27 @@ function App() {
                   <XAxis />
                   <YAxis />
                   <LineSeries
-                    color="red"
-                    fill="false"
+                    color="green"
+                    style={{fill: 'none'}}
                     data={generateChartData(funct, a, b).data} />
-                    {graphMethod == 'rectangle' ? 
+                    {graphMethod == GraphMethodType.RECTANGLES.key ? 
+                      <VerticalRectSeries
+                        colorType='literal'
+                        opacity={0.5}
+                        stroke={'black'}
+                        data={compiledRectangles['rectangles_points']}
+                        animation={"noWobble"}
+                      />
+                      :
                       <MarkSeries/>
-                    :
-                      <VerticalRectSeries/>}
+                    }
                 </FlexibleXYPlot>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={4}>
             <TextField id="function" label="Función" variant="outlined" value={funct} onChange={(e) => setFunct(e.target.value)} />
-            <TextField id="width-a" label="a" variant="outlined" value={a} oncChange={(e) => setA(e.target.value)} />
+            <TextField id="width-a" label="a" variant="outlined" value={a} onChange={(e) => setA(e.target.value)} />
             <TextField id="width-b" label="b" variant="outlined" value={b} onChange={(e) => setB(e.target.value)} />
             <TextField id="n" label="n" variant="outlined" value={n} onChange={(e) => setN(e.target.value)} />
             <FormControl fullWidth>
@@ -92,12 +117,15 @@ function App() {
                 id="graph-method-select"
                 value={graphMethod}
                 label="Método"
-                onChange={(e) => setGraphMethod(e.target.value)}
+                onChange={(e) => {setGraphMethod(e.target.value); compileOperation(e.target.value)}}
               >
-                <MenuItem value={'rectangle'}>Rectángulos</MenuItem>
-                <MenuItem value={'montecarlo'}>Montecarlo</MenuItem>
+                <MenuItem value={GraphMethodType.RECTANGLES.key}>{GraphMethodType.RECTANGLES.name}</MenuItem>
+                <MenuItem value={GraphMethodType.MONTECARLO.key}>{GraphMethodType.MONTECARLO.name}</MenuItem>
               </Select>
             </FormControl>
+          </Grid>
+          <Grid>
+            <label>Área({funct}) = {aproximationResult}</label>
           </Grid>
         </Grid>
       </Grid>
