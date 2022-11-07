@@ -92,11 +92,10 @@ function App() {
                     data={generateChartData(funct, a, b).data} />
                     {graphMethod == GraphMethodType.RECTANGLES.key ? 
                       <VerticalRectSeries
-                        colorType='literal'
-                        opacity={0.5}
-                        stroke={'black'}
+                        colortype='literal'
+                        opacity={0.45}
+                        stroke={'#3e4444'}
                         data={compiledRectangles['rectangles_points']}
-                        animation={"noWobble"}
                       />
                       :
                       <MarkSeries/>
