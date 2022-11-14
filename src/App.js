@@ -1,6 +1,6 @@
 import './App.css';
 
-import { Box, Container, Grid, Typography, Card, CardContent, TextField, FormControl, InputLabel, Select, MenuItem, Button } from '@mui/material';
+import { Alert, Box, Container, Grid, Typography, Card, CardContent, TextField, FormControl, InputLabel, Select, MenuItem, Button } from '@mui/material';
 import { HorizontalGridLines, LineSeries, makeWidthFlexible, MarkSeries, VerticalGridLines, VerticalRectSeries, XAxis, XYPlot, YAxis } from "react-vis";
 import * as math from 'mathjs';
 import { useState, useEffect } from 'react';
@@ -40,13 +40,50 @@ function App() {
   const [compiledRectangles, setCompiledRectangles] = useState({});
   const [aproximationResult, setAproximationResult] = useState('');
   const [compiledPoints, setCompiledPoints] = useState([]);
+  
+  const [errorA, setErrorA] = useState(false);
+  const [errorMessageA, setErrorMessageA] = useState('');
+  const [errorB, setErrorB] = useState(false);
+  const [errorMessageB, setErrorMessageB] = useState('');
+  const [errorN, setErrorN] = useState(false);
+  const [errorMessageN, setErrorMessageN] = useState('');
 
   useEffect(() => {
-    if (inputA === '' || inputB === '') return;
-    if (inputA > inputB) return;
+
+    setErrorA(false);
+    setErrorMessageA('');
+    setErrorB(false);
+    setErrorMessageB('');
+    setErrorN(false);
+    setErrorMessageN('');
+
+    if (inputA === '') {
+      setErrorA(true);
+      setErrorMessageA('No puede estar vacío');
+      return;
+    }
+    if (inputB === '') {
+      setErrorB(true);
+      setErrorMessageB('No puede estar vacío');
+      return;
+    }
+    if (inputN === '') {
+      setErrorN(true);
+      setErrorMessageN('No puede estar vacío');
+      return;
+    }
+    if (inputA >= inputB) {
+      setErrorA(true);
+      setErrorMessageA('Debe ser menor a "b"');
+      return;
+    }
     console.log("a > b validation ok");
 
-    if (inputN <= 0) return;
+    if (inputN <= 0) {
+      setErrorN(true);
+      setErrorMessageN('Debe ser mayor a 0');
+      return;
+    }
     console.log("n <= 0 validation ok");
 
     console.log("mock: " + math.compile('x').evaluate({ x: 1 }));
@@ -89,7 +126,6 @@ function App() {
   function onChangeInputMethod(methodKey) {
     setInputGraphMethod(methodKey);
   }
-
 
   function compileOperation(funct, a, b, n, graphMethod) {
     if (graphMethod == GraphMethodType.RECTANGLES.key) {
@@ -165,9 +201,9 @@ function App() {
 
     const maxYRandomPoints = randomPoints.length === 0 ? 0 : math.max(randomPoints.map(p => p.y));
     const successPointsCount = randomPoints.reduce((a, v) => (v.isSuccess ? a + 1 : a), 0);
-    const montecarloValue = math.round((successPointsCount/randomPoints.length) * (b-a) * maxYRandomPoints, 2);
+    const montecarloValue = math.round((successPointsCount / randomPoints.length) * (b - a) * maxYRandomPoints, 2);
 
-    return {points: randomPoints, value: montecarloValue};
+    return { points: randomPoints, value: montecarloValue };
   }
 
   return (
@@ -219,10 +255,43 @@ function App() {
             bgcolor: 'background.paper',
             borderRadius: 1,
           }}>
-            <TextField id="function" label="Función" variant="outlined" value={inputExpr} onChange={(e) => onChangeFunctionHandler(e.target.value)} />
-            <TextField id="width-a" type="number" label="a" variant="outlined" value={inputA} onChange={(e) => onChangeInputA(e.target.value)} />
-            <TextField id="width-b" type="number" label="b" variant="outlined" value={inputB} onChange={(e) => onChangeInputB(e.target.value)} />
-            <TextField id="n" type="number" label="n" variant="outlined" value={inputN} onChange={(e) => onChangeInputN(e.target.value)} />
+            <TextField 
+              id="function" 
+              label="Función" 
+              variant="outlined" 
+              value={inputExpr} 
+              onChange={(e) => onChangeFunctionHandler(e.target.value)} 
+            />
+            <TextField 
+              id="width-a" 
+              type="number" 
+              label="a" 
+              variant="outlined" 
+              value={inputA} 
+              onChange={(e) => onChangeInputA(e.target.value)} 
+              error={errorA} 
+              helperText={errorMessageA} 
+            />
+            <TextField 
+              id="width-b" 
+              type="number" 
+              label="b" 
+              variant="outlined" 
+              value={inputB} 
+              onChange={(e) => onChangeInputB(e.target.value)}
+              error={errorB} 
+              helperText={errorMessageB}  
+            />
+            <TextField 
+              id="n"
+              type="number" 
+              label="n" 
+              variant="outlined"
+              value={inputN} 
+              onChange={(e) => onChangeInputN(e.target.value)}
+              error={errorN} 
+              helperText={errorMessageN}  
+            />
             <FormControl fullWidth>
               <InputLabel id="graph-method">Método</InputLabel>
               <Select
@@ -237,7 +306,7 @@ function App() {
             </FormControl>
             {inputGraphMethod == GraphMethodType.MONTECARLO.key ?
               <Button variant="contained" onClick={() => compileOperation(inputExpr, inputA, inputB, inputN, inputGraphMethod)}>Regenerar puntos</Button>
-            :
+              :
               <></>}
             <MathJaxContext>
               <MathJax>{`$$\\int_{${inputA}}^{${inputB}} ${texExpr} \\, dx \\approx ${math.round(aproximationResult, 6)} $$`}</MathJax>
