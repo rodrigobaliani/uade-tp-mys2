@@ -36,3 +36,32 @@
     transform: rotate(360deg);
   }
 }
+
+.tituloContenedor{
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.titulo{
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  width: 100%;
+}
+.contenedor{
+  display: flex;
+  width: 100%;
+  justify-content: space-evenly;
+}
+
+.grafico{
+  max-width: 50%;
+  width: 50%;
+}
+
+ .inputsContenedor{
+  width: 30%;
+}
+
+.inputs{
+  margin-top: 1rem;
+}

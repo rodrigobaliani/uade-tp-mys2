@@ -1,5 +1,6 @@
 import './App.css';
-import { Container, Grid, Typography, Card, CardContent, TextField, FormControl, InputLabel, Select, MenuItem, Button } from '@mui/material';
+
+import { Box ,Container, Grid, Typography, Card, CardContent, TextField, FormControl, InputLabel, Select, MenuItem, Button } from '@mui/material';
 import { HorizontalGridLines, LineSeries, makeWidthFlexible, MarkSeries, VerticalGridLines, VerticalRectSeries, XAxis, XYPlot, YAxis } from "react-vis";
 import * as math from 'mathjs';
 import { useState, useEffect } from 'react';
@@ -140,18 +141,19 @@ function App() {
   }
 
   return (
-    <Container maxWidth={false}>
+    <Container maxWidth={false} class="tituloContenedor">
       <Grid container spacing={3}>
-        <Grid item xs={12}>
+        <Grid item xs={12} class="titulo">
           <Typography style={{ textAlign: 'center', color: 'black' }} variant='h4'>
-            Integración por aproximación
+            Integración por aproximación 
           </Typography>
         </Grid>
-        <Grid item xs={12}>
+        <div></div>
+        <Grid item xs={12} class="contenedor">
           <Grid item xs={8}>
             <Card>
               <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                <FlexibleXYPlot height={600}>
+                <FlexibleXYPlot height={500}>
                   <VerticalGridLines />
                   <HorizontalGridLines />
                   <XAxis />
@@ -174,10 +176,17 @@ function App() {
               </CardContent>
             </Card>
           </Grid>
-          <Grid item xs={4}>
-            <TextField id="function" label="Función" variant="outlined" value={inputExpr} onChange={(e) => onChangeFunctionHandler(e.target.value)} />
-            <TextField id="width-a" type="number" label="a" variant="outlined" value={inputA} onChange={(e) => onChangeInputA(e.target.value)} />
-            <TextField id="width-b" type="number" label="b" variant="outlined" value={inputB} onChange={(e) => onChangeInputB(e.target.value)} />
+          <Box sx={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          flexDirection: 'column',
+          justifyContent:'space-evenly',
+          bgcolor: 'background.paper',
+          borderRadius: 1,
+        }}>
+            <TextField id="function"  label="Función" variant="outlined" value={inputExpr} onChange={(e) => onChangeFunctionHandler(e.target.value)} />
+            <TextField id="width-a"  type="number" label="a" variant="outlined" value={inputA} onChange={(e) => onChangeInputA(e.target.value)} />
+            <TextField id="width-b"  type="number" label="b" variant="outlined" value={inputB} onChange={(e) => onChangeInputB(e.target.value)} />
             <TextField id="n" type="number" label="n" variant="outlined" value={inputN} onChange={(e) => onChangeInputN(e.target.value)} />
             <FormControl fullWidth>
               <InputLabel id="graph-method">Método</InputLabel>
@@ -191,12 +200,10 @@ function App() {
                 <MenuItem value={GraphMethodType.MONTECARLO.key}>{GraphMethodType.MONTECARLO.name}</MenuItem>
               </Select>
             </FormControl>
-          </Grid>
-          <Grid>
             <MathJaxContext>          
               <MathJax>{`$$\\int_{${inputA}}^{${inputB}} ${texExpr} \\, dx \\approx ${math.round(aproximationResult, 6)} $$`}</MathJax>
             </MathJaxContext>
-          </Grid>
+          </Box>
         </Grid>
       </Grid>
     </Container >
