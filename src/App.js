@@ -31,12 +31,6 @@ function App() {
   const [inputN, setInputN] = useState(INITIAL_N);
   const [inputGraphMethod, setInputGraphMethod] = useState(INITIAL_GRAPH_METHOD);
 
-  const [funct, setFunct] = useState(INITIAL_EXPR);
-  const [a, setA] = useState(INITIAL_A);
-  const [b, setB] = useState(INITIAL_B);
-  const [n, setN] = useState(INITIAL_N);
-  const [graphMethod, setGraphMethod] = useState(INITIAL_GRAPH_METHOD);
-
   const [compiledExpr, setCompiledExpr] = useState('');
   const [texExpr, setTexExpr] = useState('');
   const [chartData, setChartData] = useState([])
@@ -44,100 +38,48 @@ function App() {
   const [aproximationResult, setAproximationResult] = useState('');
 
   useEffect(() => {
-    console.log("before validations useFffect");
-    console.log(inputExpr);
-    console.log(a);
-    console.log(b);
-    console.log(n);
-    console.log(inputGraphMethod);
+    if (inputA === '' || inputB === '') return;
+    if (inputA > inputB) return;
+    console.log("a > b validation ok");
+
+    if (inputN <= 0) return;
+    console.log("n <= 0 validation ok");
+
+    console.log("mock: "+math.compile('x').evaluate({x: 1}));
+
     try {
-      const testCompile = math.compile(inputExpr).evaluate({x: inputA});
-      if (typeof testCompile !== 'number') return;
+      const testCompileA = math.compile(inputExpr).evaluate({x: Number(inputA)});
+      const testCompileB = math.compile(inputExpr).evaluate({x: Number(inputB)});
+
+      if (typeof testCompileA !== 'number' || typeof testCompileB !== 'number') return;
     } catch (error) {
       return;
     }
+    console.log("compile expression validation ok");
 
-    if (inputA > inputB) return;
-    if (inputN <= 0) return;
+    console.log("All validations OK");
 
-    setFunct(inputExpr);
-    setA(a);
-    setB(b);
-    setN(n);
-    setGraphMethod(inputGraphMethod);
-
-    console.log("useEffect ok");
-    console.log(inputExpr);
-    console.log(a);
-    console.log(b);
-    console.log(n);
-    console.log(inputGraphMethod);
-
-    compileOperation();
+    compileOperation(inputExpr, inputA, inputB, inputN, inputGraphMethod);
   }, [inputExpr, inputA, inputB, inputN, inputGraphMethod]);
-/*
-  function onChangeFunctionHandler(stringExpr) {
-    try {
-      setInputExpr(stringExpr);
-      if (stringExpr == '') {
-        throw new Error("empty_expression_input");
-      }
-      math.parse(stringExpr);
-      setFunct(stringExpr);
-      compileOperation();
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  function onChangeInputA(a) {
-      if (a > b) {
-        console.log("Error: a debe ser menor que b");
-      } else {
-        setA(a);
-        compileOperation();
-      }
-  }
-
-  function onChangeInputB(b) {
-    if (a > b) {
-      console.log("Error: a debe ser menor que b");
-    } else {
-      setB(b);
-      compileOperation();
-    }
-  }
-
-  function onChangeInputN(n) {
-    if (n <= 0) {
-      console.log("Error: a debe ser mayor a 0");
-    } else {
-      setN(n);
-      compileOperation();
-    }
-  }
-
-  function onChangeInputMethod(methodKey) {
-    setGraphMethod(methodKey); 
-    compileOperation();
-  }
-  */
-
   
   function onChangeFunctionHandler(stringExpr) {
     setInputExpr(stringExpr);
+    console.log(typeof stringExpr);
   }
 
   function onChangeInputA(a) {
     setInputA(a);
+    console.log(typeof a);
   }
 
   function onChangeInputB(b) {
     setInputB(b);
+    console.log(typeof b);
   }
 
   function onChangeInputN(n) {
     setInputN(n);
+    console.log(typeof n);
   }
 
   function onChangeInputMethod(methodKey) {
@@ -145,7 +87,7 @@ function App() {
   }
 
 
-  function compileOperation() {
+  function compileOperation(funct, a, b, n, graphMethod) {
     if (graphMethod == GraphMethodType.RECTANGLES.key) {
       console.log("Rectangles method");
       const newParsedExpr = math.parse(funct);
@@ -159,6 +101,7 @@ function App() {
       const compiledRectangles = calculateRectangles(funct, a, b, n);
       setCompiledRectangles(compiledRectangles);
       setAproximationResult(compiledRectangles['area']);
+      console.log("rectangle total area:"+compiledRectangles['area'])
 
     } else if (graphMethod == GraphMethodType.MONTECARLO.key) {
       console.log("Montecarlo method");
@@ -217,7 +160,7 @@ function App() {
                     color="green"
                     style={{fill: 'none'}}
                     data={chartData} />
-                    {graphMethod == GraphMethodType.RECTANGLES.key ? 
+                    {inputGraphMethod == GraphMethodType.RECTANGLES.key ? 
                       <VerticalRectSeries
                         colortype='literal'
                         opacity={0.45}
@@ -251,7 +194,7 @@ function App() {
           </Grid>
           <Grid>
             <MathJaxContext>          
-              <MathJax>{`$$\\int_{${a}}^{${b}} ${texExpr} \\, dx \\approx ${math.round(aproximationResult, 6)} $$`}</MathJax>
+              <MathJax>{`$$\\int_{${inputA}}^{${inputB}} ${texExpr} \\, dx \\approx ${math.round(aproximationResult, 6)} $$`}</MathJax>
             </MathJaxContext>
           </Grid>
         </Grid>
