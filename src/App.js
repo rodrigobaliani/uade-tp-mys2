@@ -147,6 +147,7 @@ function App() {
       console.log("Montecarlo method");
       const newChartData = generateChartData(funct, a, b);
       const compiledPoints = calculateMontecarlo(funct, a, b, n, newChartData);
+      setChartData(newChartData);
       setCompiledPoints(compiledPoints['points']);
       setAproximationResult(compiledPoints['value']);
     }
@@ -169,6 +170,7 @@ function App() {
     var rectangles_points = []
 
     math.range(a, b, rectangleWidth, false).forEach(x0 => {
+      
       const evaluation_x = x0 + rectangleWidth / 2;
       const y = compiledFunction.evaluate({ x: evaluation_x });
       const graph_points = {
@@ -176,7 +178,7 @@ function App() {
         x: x0 + rectangleWidth, // Rectangle right side coordinate
         y: y, // Rectangle   (Y value)
       };
-      area += rectangleWidth * y;
+      area += rectangleWidth * Math.abs(y);
       rectangles_points.push(graph_points);
     });
 
