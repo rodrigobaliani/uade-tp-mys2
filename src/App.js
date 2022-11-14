@@ -2,21 +2,26 @@ import './App.css';
 import { Container, Grid, Typography, Card, CardContent, TextField, FormControl, InputLabel, Select, MenuItem, Button } from '@mui/material';
 import { HorizontalGridLines, LineSeries, makeWidthFlexible, MarkSeries, VerticalGridLines, VerticalRectSeries, XAxis, XYPlot, YAxis } from "react-vis";
 import * as math from 'mathjs';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MathJax, MathJaxContext } from 'better-react-mathjax';
-import { isInteger } from 'mathjs'; 
+import { isInteger } from 'mathjs';
 
-const X_VALUES_COUNT = 50;
-const INITIAL_EXPR = 'x';
-const INITIAL_A = '2';
-const INITIAL_N = '20';
-
-const FlexibleXYPlot = makeWidthFlexible(XYPlot);
 
 const GraphMethodType = {
   RECTANGLES: {key: 'RECTANGLES', name: 'Rectángulos'},
   MONTECARLO: {key: 'MONTECARLO', name: 'Monte Carlo'}
 };
+
+const X_VALUES_COUNT = 50;
+const INITIAL_EXPR = 'x';
+const INITIAL_A = 2;
+const INITIAL_B = 6;
+const INITIAL_N = 20;
+const INITIAL_GRAPH_METHOD = GraphMethodType.RECTANGLES.key;
+
+const FlexibleXYPlot = makeWidthFlexible(XYPlot);
+
+
 
 function App() {
 
@@ -24,25 +29,57 @@ function App() {
   const [inputA, setInputA] = useState(INITIAL_A);
   const [inputB, setInputB] = useState(INITIAL_B);
   const [inputN, setInputN] = useState(INITIAL_N);
+  const [inputGraphMethod, setInputGraphMethod] = useState(INITIAL_GRAPH_METHOD);
 
-  const [funct, setFunct] = useState(INIAL_EXPR);
+  const [funct, setFunct] = useState(INITIAL_EXPR);
   const [a, setA] = useState(INITIAL_A);
   const [b, setB] = useState(INITIAL_B);
-  const [n, setN] = useState(INITIAL_N)
-  ;
-  const [graphData, setGraphData] = useState({});
-  const [graphMethod, setGraphMethod] = useState(GraphMethodType.RECTANGLES.key);
-  
+  const [n, setN] = useState(INITIAL_N);
+  const [graphMethod, setGraphMethod] = useState(INITIAL_GRAPH_METHOD);
+
   const [compiledExpr, setCompiledExpr] = useState('');
   const [texExpr, setTexExpr] = useState('');
   const [chartData, setChartData] = useState([])
   const [compiledRectangles, setCompiledRectangles] = useState({});
   const [aproximationResult, setAproximationResult] = useState('');
 
+  useEffect(() => {
+    console.log("before validations useFffect");
+    console.log(inputExpr);
+    console.log(a);
+    console.log(b);
+    console.log(n);
+    console.log(inputGraphMethod);
+    try {
+      const testCompile = math.compile(inputExpr).evaluate({x: inputA});
+      if (typeof testCompile !== 'number') return;
+    } catch (error) {
+      return;
+    }
+
+    if (inputA > inputB) return;
+    if (inputN <= 0) return;
+
+    setFunct(inputExpr);
+    setA(a);
+    setB(b);
+    setN(n);
+    setGraphMethod(inputGraphMethod);
+
+    console.log("useEffect ok");
+    console.log(inputExpr);
+    console.log(a);
+    console.log(b);
+    console.log(n);
+    console.log(inputGraphMethod);
+
+    compileOperation();
+  }, [inputExpr, inputA, inputB, inputN, inputGraphMethod]);
+/*
   function onChangeFunctionHandler(stringExpr) {
     try {
       setInputExpr(stringExpr);
-      if (stringExpr.length < 1) {
+      if (stringExpr == '') {
         throw new Error("empty_expression_input");
       }
       math.parse(stringExpr);
@@ -84,6 +121,29 @@ function App() {
     setGraphMethod(methodKey); 
     compileOperation();
   }
+  */
+
+  
+  function onChangeFunctionHandler(stringExpr) {
+    setInputExpr(stringExpr);
+  }
+
+  function onChangeInputA(a) {
+    setInputA(a);
+  }
+
+  function onChangeInputB(b) {
+    setInputB(b);
+  }
+
+  function onChangeInputN(n) {
+    setInputN(n);
+  }
+
+  function onChangeInputMethod(methodKey) {
+    setInputGraphMethod(methodKey); 
+  }
+
 
   function compileOperation() {
     if (graphMethod == GraphMethodType.RECTANGLES.key) {
@@ -173,15 +233,15 @@ function App() {
           </Grid>
           <Grid item xs={4}>
             <TextField id="function" label="Función" variant="outlined" value={inputExpr} onChange={(e) => onChangeFunctionHandler(e.target.value)} />
-            <TextField id="width-a" type="number" label="a" variant="outlined" value={a} onChange={(e) => onChangeInputA(e.target.value)} />
-            <TextField id="width-b" type="number" label="b" variant="outlined" value={b} onChange={(e) => onChangeInputB(e.target.value)} />
-            <TextField id="n" type="number" label="n" variant="outlined" value={n} onChange={(e) => onChangeInputN(e.target.value)} />
+            <TextField id="width-a" type="number" label="a" variant="outlined" value={inputA} onChange={(e) => onChangeInputA(e.target.value)} />
+            <TextField id="width-b" type="number" label="b" variant="outlined" value={inputB} onChange={(e) => onChangeInputB(e.target.value)} />
+            <TextField id="n" type="number" label="n" variant="outlined" value={inputN} onChange={(e) => onChangeInputN(e.target.value)} />
             <FormControl fullWidth>
               <InputLabel id="graph-method">Método</InputLabel>
               <Select
                 labelId="graph-method"
                 id="graph-method-select"
-                value={graphMethod}
+                value={inputGraphMethod}
                 label="Método"
                 onChange={(e) => {onChangeInputMethod(e.target.value)}}>
                 <MenuItem value={GraphMethodType.RECTANGLES.key}>{GraphMethodType.RECTANGLES.name}</MenuItem>
