@@ -111,7 +111,8 @@ function App() {
       console.log("Montecarlo method");
       const newChartData = generateChartData(funct, a, b);
       const compiledPoints = calculateMontecarlo(funct, a, b, n, newChartData);
-      setCompiledPoints(compiledPoints)
+      setCompiledPoints(compiledPoints['points']);
+      setAproximationResult(compiledPoints['value']);
     }
   }
 
@@ -161,7 +162,12 @@ function App() {
         isSuccess: successPoint
       }
     });
-    return randomPoints;
+
+    const maxYRandomPoints = randomPoints.length === 0 ? 0 : math.max(randomPoints.map(p => p.y));
+    const successPointsCount = randomPoints.reduce((a, v) => (v.isSuccess ? a + 1 : a), 0);
+    const montecarloValue = math.round((successPointsCount/randomPoints.length) * (b-a) * maxYRandomPoints, 2);
+
+    return {points: randomPoints, value: montecarloValue};
   }
 
   return (
@@ -229,6 +235,10 @@ function App() {
                 <MenuItem value={GraphMethodType.MONTECARLO.key}>{GraphMethodType.MONTECARLO.name}</MenuItem>
               </Select>
             </FormControl>
+            {inputGraphMethod == GraphMethodType.MONTECARLO.key ?
+              <Button variant="contained" onClick={() => compileOperation(inputExpr, inputA, inputB, inputN, inputGraphMethod)}>Regenerar puntos</Button>
+            :
+              <></>}
             <MathJaxContext>
               <MathJax>{`$$\\int_{${inputA}}^{${inputB}} ${texExpr} \\, dx \\approx ${math.round(aproximationResult, 6)} $$`}</MathJax>
             </MathJaxContext>
