@@ -15,7 +15,7 @@ const GraphMethodType = {
 
 const X_VALUES_COUNT = 50;
 const INITIAL_EXPR = 'x';
-const INITIAL_A = 2;
+const INITIAL_A = 0;
 const INITIAL_B = 6;
 const INITIAL_N = 20;
 const INITIAL_GRAPH_METHOD = GraphMethodType.RECTANGLES.key;
