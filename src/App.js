@@ -229,8 +229,8 @@ function App() {
                 <FlexibleXYPlot height={600}>
                   <VerticalGridLines />
                   <HorizontalGridLines />
-                  <XAxis />
-                  <YAxis />
+                  <XAxis tickSize={4}/>
+                  <YAxis tickSize={4}/>
                   <LineSeries
                     color="green"
                     style={{ fill: 'none' }}
