@@ -1,6 +1,6 @@
 import './App.css';
 
-import { Alert, Box, Container, Grid, Typography, Card, CardContent, TextField, FormControl, InputLabel, Select, MenuItem, Button } from '@mui/material';
+import { Alert, Box, Container, Grid, Typography, Card, CardContent, TextField, FormControl, InputLabel, Select, MenuItem, Button, GlobalStyles } from '@mui/material';
 import { HorizontalGridLines, LineSeries, makeWidthFlexible, MarkSeries, VerticalGridLines, VerticalRectSeries, XAxis, XYPlot, YAxis } from "react-vis";
 import * as math from 'mathjs';
 import { useState, useEffect } from 'react';
@@ -210,6 +210,11 @@ function App() {
 
   return (
     <Container maxWidth={false} class="tituloContenedor">
+      <GlobalStyles
+        styles={{
+          body: { backgroundColor: "#f0cf89" }
+        }}
+      />
       <Grid container spacing={3}>
         <Grid item xs={12} class="titulo">
           <Typography style={{ textAlign: 'center', color: 'black' }} variant='h4'>
@@ -218,10 +223,10 @@ function App() {
         </Grid>
         <div></div>
         <Grid item xs={12} class="contenedor">
-          <Grid item xs={8}>
+          <Grid item xs={7}>
             <Card>
               <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                <FlexibleXYPlot height={500}>
+                <FlexibleXYPlot height={600}>
                   <VerticalGridLines />
                   <HorizontalGridLines />
                   <XAxis />
@@ -256,11 +261,15 @@ function App() {
             justifyContent: 'space-evenly',
             bgcolor: 'background.paper',
             borderRadius: 1,
+            boxShadow: 1,
+            p: 3,
+            width: 300
           }}>
             <TextField 
               id="function" 
               label="Función" 
-              variant="outlined" 
+              variant="outlined"
+              fullWidth
               value={inputExpr} 
               onChange={(e) => onChangeFunctionHandler(e.target.value)} 
             />
@@ -269,6 +278,7 @@ function App() {
               type="number" 
               label="a" 
               variant="outlined" 
+              fullWidth
               value={inputA} 
               onChange={(e) => onChangeInputA(e.target.value)} 
               error={errorA} 
@@ -279,6 +289,7 @@ function App() {
               type="number" 
               label="b" 
               variant="outlined" 
+              fullWidth
               value={inputB} 
               onChange={(e) => onChangeInputB(e.target.value)}
               error={errorB} 
@@ -289,6 +300,7 @@ function App() {
               type="number" 
               label="n" 
               variant="outlined"
+              fullWidth
               value={inputN} 
               onChange={(e) => onChangeInputN(e.target.value)}
               error={errorN} 
@@ -300,6 +312,7 @@ function App() {
                 labelId="graph-method"
                 id="graph-method-select"
                 value={inputGraphMethod}
+                fullWidth
                 label="Método"
                 onChange={(e) => { onChangeInputMethod(e.target.value) }}>
                 <MenuItem value={GraphMethodType.RECTANGLES.key}>{GraphMethodType.RECTANGLES.name}</MenuItem>
@@ -307,7 +320,7 @@ function App() {
               </Select>
             </FormControl>
             {inputGraphMethod == GraphMethodType.MONTECARLO.key ?
-              <Button variant="contained" onClick={() => compileOperation(inputExpr, inputA, inputB, inputN, inputGraphMethod)}>Regenerar puntos</Button>
+              <Button variant="contained" fullWidth onClick={() => compileOperation(inputExpr, inputA, inputB, inputN, inputGraphMethod)}>Regenerar puntos</Button>
               :
               <></>}
             <MathJaxContext>
